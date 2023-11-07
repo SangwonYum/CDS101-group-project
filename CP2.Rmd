@@ -1,0 +1,86 @@
+---
+title: "Assignment 8: CP2"
+author: "Sangwon Yum"
+date: "`r Sys.Date()`"
+documentclass: article
+geometry: margin=1in
+fontsize: 11pt
+output:
+  pdf_document:
+    highlight: tango
+    toc: false
+    df_print: kable
+    fig_caption: no
+    number_sections: no
+    dev: pdf
+    latex_engine: xelatex
+mainfont: "Malgun Gothic"
+---
+
+```{r setup, include = FALSE}
+# Set knitr options
+knitr::opts_chunk$set(
+  echo = TRUE, eval = TRUE, fig.width = 6, warning = FALSE,
+  message = FALSE, fig.asp = 0.618, out.width = "80%", dpi = 120,
+  fig.align = "center", cache = FALSE
+)
+
+# Load required packages
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(broom))
+suppressPackageStartupMessages(library(modelr))
+suppressPackageStartupMessages(library(plotly))
+
+# Load dataset
+data = readr::read_csv("smmh.csv")
+```
+
+
+```{r}
+data_r <- data %>%
+  select(-1, -4, -5, -6, -7, -16, -17)
+```
+
+```{r}
+data_r <- data_r %>%
+  mutate(dependence = rowMeans(select(., c(5, 6, 7, 11)), na.rm = TRUE)) %>%
+  select(-c(5, 6, 7, 11))
+```
+
+```{r}
+data_r <- data_r %>%
+  mutate(interferece = rowMeans(select(., c(5,7)), na.rm = TRUE))%>%
+  select(-c(5,7))
+```
+
+```{r}
+data_r <- data_r %>%
+  mutate(mental_health = rowMeans(select(., c(5,6,7,8)), na.rm = TRUE))%>%
+  select(-c(5,6,7,8))
+```
+
+
+
+```{r}
+data_r <- data_r %>%
+  rename(age = `1. What is your age?`,
+         gender = `2. Gender`,
+         platform = `7. What social media platforms do you commonly use?`,
+         avgtime = `8. What is the average time you spend on social media every day?`
+         )
+```
+
+
+
+```{r}
+data_r <- data_r %>%
+  mutate(avgtime_numeric = case_when(
+    avgtime == "Less than an Hour" ~ 0.5,
+    avgtime == "between 1 and 2 hours" ~ 1.5,
+    avgtime == "between 2 and 3 hours" ~ 2.5,
+    avgtime == "between 3 and 4 hours" ~ 3.5,
+    avgtime == "between 4 and 5 hours" ~ 4.5,
+    avgtime == "More than 5 hours" ~ 5.5,
+    TRUE ~ NA_real_ 
+  ))
+```
